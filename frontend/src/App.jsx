@@ -15,12 +15,14 @@ import ShopAccount from "./pages/shop/Account";
 import ShopCheckOut from "./pages/shop/Checkout";
 import Auth from "./components/utils/Auth";
 import Unuthorized from "./pages/NotFound/Unuthorized";
+import Home from "./pages/Home";
 
 function App() {
   return (
     <>
       <div className="flex flex-col overflow-hidden bg-white">
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/auth" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
