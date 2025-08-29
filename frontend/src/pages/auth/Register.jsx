@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -6,6 +7,8 @@ const Register = () => {
     email: "",
     password: "",
   });
+  
+  const dispatch =useDispatch()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
