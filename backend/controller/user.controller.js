@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 export const addUser = async (req, res) => {
   try {
-    const { userName, email, password, role } = req.body;
+    const { username, email, password, role } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -15,7 +15,7 @@ export const addUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      userName,
+      username,
       email,
       password: hashedPassword,
       role,
@@ -79,7 +79,7 @@ export const updateUser = async (req, res) => {
       updates.password = hashedPassword;
     }
     if (email) updates.email = email;
-
+ 
     const user = await User.findByIdAndUpdate(req.params.id, updates, {
       new: true,
     });
