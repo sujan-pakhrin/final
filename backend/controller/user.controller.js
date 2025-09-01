@@ -59,8 +59,6 @@ export const getUser = async (req, res) => {
   }
 };
 
-import bcrypt from "bcryptjs";
-import User from "../models/User.js";
 
 export const updateUser = async (req, res) => {
   try {
