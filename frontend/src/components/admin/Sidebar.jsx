@@ -1,107 +1,201 @@
-import React, { Fragment } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
-  FiCheckCircle,
-  FiLayout,
-  FiShoppingBag,
-  FiBarChart2,
-  FiX,
-} from "react-icons/fi";
+  MdDashboard,
+  MdPerson,
+  MdLogout,
+  MdKeyboardArrowDown,
+  MdKeyboardArrowRight,
+} from "react-icons/md";
+import {
+  FaShoppingCart,
+  FaBorderAll,
+  FaUsers,
+  FaChartBar,
+  FaCog,
+} from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
 
-const adminSidebarMenuItems = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    path: "/admin/dashboard",
-    icon: <FiLayout />,
-  },
-  {
-    id: "product",
-    label: "Product",
-    path: "/admin/product",
-    icon: <FiShoppingBag />,
-  },
-  {
-    id: "order",
-    label: "Order",
-    path: "/admin/order",
-    icon: <FiCheckCircle />,
-  },
-];
+const Sidebar = () => {
+  const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
+  const location = useLocation();
 
-const MenuItems = ({ setOpen }) => {
-  const navigate = useNavigate();
+  const menuItems = [
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: <MdDashboard className="text-xl" />,
+      path: "/admin/dashboard",
+      badge: null,
+    },
+    {
+      id: "products",
+      label: "Products",
+      icon: <FaShoppingCart className="text-xl" />,
+      path: null,
+      hasSubmenu: true,
+      submenu: [
+        { label: "All Products", path: "/admin/product" },
+        { label: "Add Product", path: "/admin/product/add" },
+      ],
+    },
+    {
+      id: "orders",
+      label: "Orders",
+      icon: <FaBorderAll className="text-xl" />,
+      path: "/admin/order",
+      badge: "12",
+    },
+    {
+      id: "customers",
+      label: "Customers",
+      icon: <FaUsers className="text-xl" />,
+      path: "/admin/customer",
+      badge: null,
+    },
+    {
+      id: "analytics",
+      label: "Analytics",
+      icon: <FaChartBar className="text-xl" />,
+      path: "/admin/analytic",
+      badge: null,
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: <FaCog className="text-xl" />,
+      path: "/admin/setting",
+      badge: null,
+    },
+  ];
+
+  const isActive = (path) => {
+    if (!path) return false;
+    return location.pathname === path;
+  };
+
+  const isParentActive = (submenu) => {
+    return submenu?.some((item) => location.pathname === item.path);
+  };
+
+  const toggleProductMenu = () => {
+    setIsProductMenuOpen(!isProductMenuOpen);
+  };
 
   return (
-    <nav className="mt-6 flex-col flex gap-2">
-      {adminSidebarMenuItems.map((menuItem) => (
-        <div
-          key={menuItem.id}
-          onClick={() => {
-            navigate(menuItem.path);
-            if (setOpen) setOpen(false);
-          }}
-          className="flex cursor-pointer text-base items-center gap-3 rounded-md px-3 py-2 text-muted-foreground hover:bg-muted hover:text-foreground transition"
-        >
-          <span className="text-xl">{menuItem.icon}</span>
-          <span>{menuItem.label}</span>
-        </div>
-      ))}
-    </nav>
-  );
-};
-
-const Sidebar = ({ open, setOpen }) => {
-  const navigate = useNavigate();
-
-  return (
-    <Fragment>
-      {open && (
-        <div
-          className="fixed inset-0 z-40 bg-black/40"
-          onClick={() => setOpen(false)}
-        />
-      )}
-
-      <div
-        className={`fixed z-50 top-0 left-0 h-full w-64 bg-background border-r p-6 transition-transform duration-200 lg:hidden ${
-          open ? "translate-x-0" : "-translate-x-full"
-        }`}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className="flex items-center justify-between mb-4 border-b pb-4">
-          <div
-            onClick={() => {
-              navigate("/admin/dashboard");
-              setOpen(false);
-            }}
-            className="flex items-center gap-2 cursor-pointer"
-          >
-            <FiBarChart2 className="text-xl" />
-            <h1 className="text-xl font-extrabold">Admin Panel</h1>
+    <div className="w-64 h-screen bg-white border-r border-gray-200 shadow-sm flex flex-col">
+      <div className="px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+            <MdDashboard className="text-white text-xl" />
           </div>
-          <button
-            onClick={() => setOpen(false)}
-            className="p-2 rounded-md hover:bg-muted"
-            aria-label="Close sidebar"
-          >
-            <FiX className="text-lg" />
-          </button>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
+            <p className="text-xs text-gray-500">Management System</p>
+          </div>
         </div>
-        <MenuItems setOpen={setOpen} />
       </div>
-      <aside className="hidden lg:flex w-64 flex-col border-r bg-background p-6">
-        <div
-          onClick={() => navigate("/admin/dashboard")}
-          className="flex cursor-pointer items-center gap-2"
+
+      <nav className="flex-1 px-4 py-6 overflow-y-auto">
+        <ul className="space-y-2">
+          {menuItems.map((item) => (
+            <li key={item.id}>
+              {item.hasSubmenu ? (
+                <>
+                  <button
+                    onClick={toggleProductMenu}
+                    className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-lg transition-colors duration-200 ${
+                      isParentActive(item.submenu)
+                        ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={
+                          isParentActive(item.submenu)
+                            ? "text-blue-700"
+                            : "text-gray-500"
+                        }
+                      >
+                        {item.icon}
+                      </span>
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {item.badge && (
+                        <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded-full">
+                          {item.badge}
+                        </span>
+                      )}
+                      {isProductMenuOpen ? (
+                        <MdKeyboardArrowDown className="text-gray-400" />
+                      ) : (
+                        <MdKeyboardArrowRight className="text-gray-400" />
+                      )}
+                    </div>
+                  </button>
+
+                  {isProductMenuOpen && (
+                    <ul className="mt-2 ml-8 space-y-1">
+                      {item.submenu.map((subItem, index) => (
+                        <li key={index}>
+                          <Link
+                            to={subItem.path}
+                            className={`block px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
+                              isActive(subItem.path)
+                                ? "bg-blue-50 text-blue-700 font-medium"
+                                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            }`}
+                          >
+                            {subItem.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors duration-200 ${
+                    isActive(item.path)
+                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={
+                        isActive(item.path) ? "text-blue-700" : "text-gray-500"
+                      }
+                    >
+                      {item.icon}
+                    </span>
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                  {item.badge && (
+                    <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded-full">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="px-4 py-4 border-t border-gray-100">
+       
+        
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200"
         >
-          <FiBarChart2 className="text-2xl" />
-          <h1 className="text-2xl font-extrabold">Admin Panel</h1>
-        </div>
-        <MenuItems />
-      </aside>
-    </Fragment>
+          <MdLogout className="text-lg" />
+          <span className="font-medium">Logout</span>
+        </button>
+      </div>
+    </div>
   );
 };
 

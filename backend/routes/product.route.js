@@ -10,4 +10,4 @@ router.get("/product/:id", getProductById);
 router.put("/product/:id", upload.single("image"), updateProduct);
 router.delete("/product/:id", deleteProduct);
 
-export default router; 
+export default router;  
