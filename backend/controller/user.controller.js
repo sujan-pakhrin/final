@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 export const addUser = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
+    
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {

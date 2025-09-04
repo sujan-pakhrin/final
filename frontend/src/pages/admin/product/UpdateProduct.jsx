@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 const UpdateProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  console.log(id);
 
   const [formData, setFormData] = useState({
     image: null,
@@ -57,7 +58,7 @@ const UpdateProduct = () => {
         );
       } catch (error) {
         console.error("Error fetching product:", error);
-        alert("Could not load product details.");
+       toast.error("Could not load product details.");
         navigate("/admin/product");
       }
     };
@@ -93,8 +94,9 @@ const UpdateProduct = () => {
       await axios.put(`/api/product/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      
 
-      alert("Product updated successfully!");
+      toast.success("Product updated successfully!");
       navigate("/admin/product");
     } catch (error) {
       console.error("Error updating product:", error);

@@ -1,56 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { MdEditSquare } from "react-icons/md";
-import { MdDeleteForever } from "react-icons/md";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { MdEditSquare, MdDeleteForever } from "react-icons/md";
 import { FaPlus } from "react-icons/fa6";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { toast } from "react-toastify";
 
-const Product = () => {
+const User = () => {
   const navigate = useNavigate();
-  const [product, setProduct] = useState([]);
-  const fetchData = async () => {
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
     await axios
-      .get("/api/product")
+      .get("/api/user")
       .then((res) => {
-        console.log(res.data.products);
-        setProduct(res.data.products);
+        console.log(res.data.users);
+        setUsers(res.data.users);
       })
       .catch((err) => {
         console.log(err);
+        toast.error("Failed to fetch users");
       });
   };
+
   useEffect(() => {
-    fetchData();
+    fetchUsers();
   }, []);
 
-  const handleUpdate = async (id) => {
-    navigate(`/admin/product/update/${id}`);
+  const handleUpdate = (id) => {
+    navigate(`/admin/user/update/${id}`);
   };
 
   const handleDelete = async (id) => {
-    
-      await axios
-        .delete(`/api/product/${id}`)
-        .then((res) => {
-          toast.success("Product deleted successfully");
-          fetxhData();
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Failed to delete the product");
-        });
-    
+    await axios
+      .delete(`/api/user/${id}`)
+      .then((res) => {
+        toast.success("User deleted successfully");
+        fetchUsers();
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Failed to delete user");
+      });
   };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
-          <p className="font-bold text-2xl">All Products</p>
-          <Link to="/admin/product/add">
+          <p className="font-bold text-2xl">All Users</p>
+          <Link to="/admin/user/add">
             <button className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
               <FaPlus className="h-4 w-4" />
-              Add Product
+              Add User
             </button>
           </Link>
         </div>
@@ -64,25 +65,13 @@ const Product = () => {
                     SN
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Product Name
+                    Username
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Description
+                    Email
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Brand
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Sale Price
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Total Stock
+                    Role
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Action
@@ -90,46 +79,34 @@ const Product = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {product.map((prod, index) => (
+                {users.map((user, index) => (
                   <tr
-                    key={prod._id}
+                    key={user._id}
                     className="hover:bg-gray-50 transition-colors duration-150"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {index + 1}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {prod.title}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 max-w-xs">
-                      <div className="truncate">{prod.description}</div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {user.username}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {prod.category}
+                      {user.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {prod.brand}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {prod.price}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                      {prod.salePrice}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {prod.totalStock}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
+                      {user.role}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleUpdate(prod._id)}
+                          onClick={() => handleUpdate(user._id)}
                           className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 px-3 py-2 rounded-md transition-colors duration-150"
                         >
                           <MdEditSquare className="h-4 w-4" />
                           Update
                         </button>
                         <button
-                          onClick={() => handleDelete(prod._id)}
+                          onClick={() => handleDelete(user._id)}
                           className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-2 rounded-md transition-colors duration-150"
                         >
                           <MdDeleteForever className="h-5 w-5" />
@@ -139,6 +116,17 @@ const Product = () => {
                     </td>
                   </tr>
                 ))}
+
+                {users.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
+                      No users found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -148,4 +136,4 @@ const Product = () => {
   );
 };
 
-export default Product;
+export default User;

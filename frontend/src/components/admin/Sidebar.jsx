@@ -16,7 +16,7 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
-  const [isProductMenuOpen, setIsProductMenuOpen] = useState(false);
+  const [openMenus, setOpenMenus] = useState({}); // track open state for all menus
   const location = useLocation();
 
   const menuItems = [
@@ -25,13 +25,11 @@ const Sidebar = () => {
       label: "Dashboard",
       icon: <MdDashboard className="text-xl" />,
       path: "/admin/dashboard",
-      badge: null,
     },
     {
       id: "products",
       label: "Products",
       icon: <FaShoppingCart className="text-xl" />,
-      path: null,
       hasSubmenu: true,
       submenu: [
         { label: "All Products", path: "/admin/product" },
@@ -49,22 +47,23 @@ const Sidebar = () => {
       id: "customers",
       label: "Customers",
       icon: <FaUsers className="text-xl" />,
-      path: "/admin/customer",
-      badge: null,
+      hasSubmenu: true,
+      submenu: [
+        { label: "All Users", path: "/admin/user" },
+        { label: "Add User", path: "/admin/user/add" },
+      ],
     },
     {
       id: "analytics",
       label: "Analytics",
       icon: <FaChartBar className="text-xl" />,
       path: "/admin/analytic",
-      badge: null,
     },
     {
       id: "settings",
       label: "Settings",
       icon: <FaCog className="text-xl" />,
       path: "/admin/setting",
-      badge: null,
     },
   ];
 
@@ -77,12 +76,16 @@ const Sidebar = () => {
     return submenu?.some((item) => location.pathname === item.path);
   };
 
-  const toggleProductMenu = () => {
-    setIsProductMenuOpen(!isProductMenuOpen);
+  const toggleMenu = (id) => {
+    setOpenMenus((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   return (
     <div className="w-64 h-screen bg-white border-r border-gray-200 shadow-sm flex flex-col">
+      {/* Logo/Header */}
       <div className="px-6 py-4 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
@@ -90,11 +93,12 @@ const Sidebar = () => {
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900">Admin Panel</h1>
-            <p className="text-xs text-gray-500">Management System</p>
+            <p className="text-xs text-gray-500">EManagement System</p>
           </div>
         </div>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 px-4 py-6 overflow-y-auto">
         <ul className="space-y-2">
           {menuItems.map((item) => (
@@ -102,7 +106,7 @@ const Sidebar = () => {
               {item.hasSubmenu ? (
                 <>
                   <button
-                    onClick={toggleProductMenu}
+                    onClick={() => toggleMenu(item.id)}
                     className={`w-full flex items-center justify-between px-4 py-3 text-left rounded-lg transition-colors duration-200 ${
                       isParentActive(item.submenu)
                         ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
@@ -127,7 +131,7 @@ const Sidebar = () => {
                           {item.badge}
                         </span>
                       )}
-                      {isProductMenuOpen ? (
+                      {openMenus[item.id] ? (
                         <MdKeyboardArrowDown className="text-gray-400" />
                       ) : (
                         <MdKeyboardArrowRight className="text-gray-400" />
@@ -135,7 +139,7 @@ const Sidebar = () => {
                     </div>
                   </button>
 
-                  {isProductMenuOpen && (
+                  {openMenus[item.id] && (
                     <ul className="mt-2 ml-8 space-y-1">
                       {item.submenu.map((subItem, index) => (
                         <li key={index}>
@@ -185,12 +189,9 @@ const Sidebar = () => {
         </ul>
       </nav>
 
+      {/* Footer */}
       <div className="px-4 py-4 border-t border-gray-100">
-       
-        
-        <button
-          className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200"
-        >
+        <button className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors duration-200">
           <MdLogout className="text-lg" />
           <span className="font-medium">Logout</span>
         </button>

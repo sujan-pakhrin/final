@@ -21,6 +21,10 @@ import NotFound from "./pages/NotFound/Index";
 import Unauthorized from "./pages/NotFound/Unuthorized";
 import Home from "./pages/Home";
 
+import AdminUser from "./pages/admin/user/User";
+import AdminAddUser from "./pages/admin/user/AddUser";
+import AdminUpdateUser from "./pages/admin/user/UpdateUser";
+
 function App() {
   return (
     <div className="flex flex-col overflow-hidden bg-white">
@@ -41,6 +45,11 @@ function App() {
             <Route index element={<AdminProduct />} />
             <Route path="add" element={<AdminProductAdd />} />
             <Route path="update/:id" element={<AdminUpdateProduct />} />
+          </Route>
+          <Route path="user">
+            <Route index element={<AdminUser />} />
+            <Route path="add" element={<AdminAddUser />} />
+            <Route path="update/:id" element={<AdminUpdateUser />} />
           </Route>
 
           <Route path="order" element={<AdminOrder />} />
