@@ -34,7 +34,7 @@ const Product = () => {
         .delete(`/api/product/${id}`)
         .then((res) => {
           toast.success("Product deleted successfully");
-          fetxhData();
+          fetchData();
         })
         .catch((err) => {
           console.log(err);
