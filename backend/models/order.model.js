@@ -1,7 +1,12 @@
 import mongoose from "mongoose";
 
-const OrderItemSchema = new mongoose.Schema(
+const OrderSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
@@ -12,23 +17,6 @@ const OrderItemSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
-    price: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-  },
-  { _id: false } 
-);
-
-const OrderSchema = new mongoose.Schema(
-  {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    items: [OrderItemSchema],
     shippingAddress: {
       fullName: { type: String, required: true },
       address: { type: String, required: true },
@@ -38,7 +26,7 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["cod", "card", "paypal"],
+      enum: ["cash", "online"],
       required: true,
     },
     paymentResult: {
@@ -61,6 +49,6 @@ const OrderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Order= mongoose.model("Order", OrderSchema);
- 
+const Order = mongoose.model("Order", OrderSchema);
+
 export default Order;
