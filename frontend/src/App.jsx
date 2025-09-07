@@ -24,6 +24,7 @@ import Home from "./pages/Home";
 import AdminUser from "./pages/admin/user/User";
 import AdminAddUser from "./pages/admin/user/AddUser";
 import AdminUpdateUser from "./pages/admin/user/UpdateUser";
+import Product from "./pages/shop/Product";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
           <Route path="list" element={<ShopList />} />
           <Route path="account" element={<ShopAccount />} />
           <Route path="checkout" element={<ShopCheckOut />} />
+          <Route path="product" element={<Product />} />
         </Route>
 
         <Route path="/unauth-page" element={<Unauthorized />} />

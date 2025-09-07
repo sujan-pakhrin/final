@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { IoPersonCircle, IoSettings, IoLogOut, IoChevronDown } from "react-icons/io5";
+import { AuthContext } from "../../context/AuthContext";
 
 const Header = () => {
+  const {user} =useContext(AuthContext)
+  console.log("User in Header:", user);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   const toggleProfileDropdown = () => setIsProfileDropdownOpen(!isProfileDropdownOpen);
