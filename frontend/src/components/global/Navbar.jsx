@@ -1,27 +1,52 @@
-import React, { useState, useRef, useEffect, use, useContext } from "react";
-import { FiSearch, FiMenu, FiX } from "react-icons/fi";
+import React, { useState, useRef, useEffect, useContext } from "react";
+import { FiSearch, FiMenu, FiX, FiUser, FiShoppingBag, FiLogOut } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import ProfileDropdown from "../profile/ProfileDropdown";
+import OrdersDropdown from "../profile/OrdersDropdown";
+
+
+
 
 const Navbar = () => {
-const {user} =useContext(AuthContext)
-console.log("User in Navbar:", user);
-  const [activeDropdown, setActiveDropdown] = useState(false);
+  const { user } = useContext(AuthContext);
+  console.log("User in Navbar:", user);
+  
+  const [activeDropdown, setActiveDropdown] = useState(null); 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const dropdownRef = useRef(null);
 
- 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const userMenuItems = [
-    { name: "My Profile", to: "/profile" },
-    { name: "My Orders", to: "/orders" },
-    { name: "Sign Out", to: "/logout", divider: true },
+    { name: "My Profile", action: "profile", icon: FiUser },
+    { name: "My Orders", action: "orders", icon: FiShoppingBag },
+    { name: "Sign Out", to: "/logout", action: "logout", icon: FiLogOut, divider: true },
   ];
 
-  const toggleDropdown = () => {
-    setActiveDropdown(!activeDropdown);
+  const toggleDropdown = (dropdownType) => {
+    setActiveDropdown(activeDropdown === dropdownType ? null : dropdownType);
+  };
+
+  const handleMenuItemClick = (item) => {
+    if (item.action === 'profile') {
+      setActiveDropdown('profile');
+    } else if (item.action === 'orders') {
+      setActiveDropdown('orders');
+    } else if (item.action === 'logout') {
+      setActiveDropdown(null);
+    }
   };
 
   const handleSearch = (e) => {};
@@ -31,20 +56,20 @@ console.log("User in Navbar:", user);
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex-shrink-0">
-           <Link to="/" className="text-2xl font-black text-blue-600">
+            <Link to="/" className="text-2xl font-black text-blue-600">
               Logo
-          </Link>
+            </Link>
           </div>
 
           <div className="hidden lg:flex items-center space-x-8 ml-12">
-           <Link
-              to="/deals"
+            <Link
+              to="/shop/product"
               className="text-gray-700 hover:text-blue-500 font-medium transition-colors duration-300"
             >
               Products
-          </Link>
-           
+            </Link>
           </div>
+          
           <div className="flex-1 max-w-xl mx-8 hidden md:block">
             <div className="relative group">
               <input
@@ -62,14 +87,13 @@ console.log("User in Navbar:", user);
           <div className="flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => toggleDropdown(true)}
-                className="w-12 h-12 bg-blue-500 font-bold text-white rounded-[50%] flex items-center justify-center"
+                onClick={() => toggleDropdown('menu')}
+                className="w-12 h-12 bg-blue-500 font-bold text-white rounded-[50%] flex items-center justify-center hover:bg-blue-600 transition-colors"
               >
-                { user?.username?.charAt(0).toUpperCase() || "NO"}
-
+                {user?.username?.charAt(0).toUpperCase() || "NO"}
               </button>
 
-              {activeDropdown  && (
+              {activeDropdown === 'menu' && (
                 <div className="absolute top-full right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
                   <div className="p-2">
                     {userMenuItems.map((item, index) => (
@@ -77,16 +101,35 @@ console.log("User in Navbar:", user);
                         {item.divider && (
                           <div className="border-t border-gray-100 my-2" />
                         )}
-                       <Link
-                          to={item.to}
-                          className="block px-4 py-3 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-xl transition-all duration-300 font-medium"
-                        >
-                          {item.name}
-                      </Link>
+                        {item.to ? (
+                          <Link
+                            to={item.to}
+                            className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-xl transition-all duration-300 font-medium"
+                          >
+                            <item.icon className="w-4 h-4" />
+                            <span>{item.name}</span>
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => handleMenuItemClick(item)}
+                            className="flex items-center space-x-3 w-full text-left px-4 py-3 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-xl transition-all duration-300 font-medium"
+                          >
+                            <item.icon className="w-4 h-4" />
+                            <span>{item.name}</span>
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
+              )}
+
+              {activeDropdown === 'profile' && (
+                <ProfileDropdown onClose={() => setActiveDropdown(null)} />
+              )}
+
+              {activeDropdown === 'orders' && (
+                <OrdersDropdown onClose={() => setActiveDropdown(null)} />
               )}
             </div>
 
@@ -121,24 +164,24 @@ console.log("User in Navbar:", user);
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-200">
           <div className="px-4 py-4 space-y-2">
-           <Link
+            <Link
               to="/deals"
               className="block px-4 py-2 text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all duration-300"
             >
               Hot Deals
-          </Link>
-           <Link
+            </Link>
+            <Link
               to="/new"
               className="block px-4 py-2 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all duration-300"
             >
               New Arrivals
-          </Link>
-           <Link
+            </Link>
+            <Link
               to="/brands"
               className="block px-4 py-2 text-gray-700 hover:bg-violet-50 hover:text-violet-600 rounded-xl transition-all duration-300"
             >
               Brands
-          </Link>
+            </Link>
           </div>
         </div>
       )}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/global/Navbar";
+import axios from "axios";
+import ProductCard from "../components/product/ProductCard";
 import {
   FaShoppingCart,
   FaHeart,
@@ -12,6 +14,7 @@ import {
   FaPhone,
 } from "react-icons/fa";
 import Footer from "../components/global/Footer";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -60,44 +63,7 @@ const HomePage = () => {
     },
   ];
 
-  const recentProducts = [
-    {
-      id: 5,
-      name: "Wireless Charging Pad",
-      price: 34.99,
-      image:
-        "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=300&h=300&fit=crop",
-      rating: 4.5,
-      reviews: 67,
-    },
-    {
-      id: 6,
-      name: "Portable Bluetooth Speaker",
-      price: 79.99,
-      image:
-        "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300&h=300&fit=crop",
-      rating: 4.4,
-      reviews: 112,
-    },
-    {
-      id: 7,
-      name: "Smart Home Hub",
-      price: 149.99,
-      image:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=300&fit=crop",
-      rating: 4.6,
-      reviews: 45,
-    },
-    {
-      id: 8,
-      name: "USB-C Fast Charger",
-      price: 24.99,
-      image:
-        "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=300&h=300&fit=crop",
-      rating: 4.3,
-      reviews: 98,
-    },
-  ];
+  const [recentProducts,setRecentProducts]=useState([]);
 
   const heroSlides = [
     {
@@ -136,7 +102,7 @@ const HomePage = () => {
     return () => clearInterval(timer);
   }, [heroSlides.length]);
 
-  const ProductCard = ({ product, showDiscount = false }) => (
+  const PopularProductCard = ({ product, showDiscount = false }) => (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group">
       <div className="relative">
         <img
@@ -186,11 +152,27 @@ const HomePage = () => {
     </div>
   );
 
+  const fetchProducts = async () => {
+    try {
+       const recentProduct=await axios.get('/api/recent')
+       console.log(recentProduct);
+       setRecentProducts(recentProduct.data.products)
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  useEffect(()=>{
+    fetchProducts()
+  },[])
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div></div>
+      <div className="h-16">
+
       <Navbar />
-      <section className="relative h-[75vh] overflow-hidden">
+      </div>
+      <section className="relative h-[60vh] overflow-hidden">
         {heroSlides.map((slide, index) => (
           <div
             key={slide.id}
@@ -278,14 +260,16 @@ const HomePage = () => {
                 Top-rated items loved by our customers
               </p>
             </div>
+            <Link to='/shop/product'>
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors duration-200 flex items-center">
               View All
               <FaChevronRight className="w-4 h-4 ml-2" />
             </button>
+            </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {popularProducts.map((product) => (
-              <ProductCard
+              <PopularProductCard
                 key={product.id}
                 product={product}
                 showDiscount={true}

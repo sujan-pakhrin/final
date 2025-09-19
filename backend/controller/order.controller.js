@@ -3,23 +3,29 @@ import Product from "../models/product.model.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { user, product, quantity, shippingAddress, paymentMethod } = req.body;
+    const { user, product, quantity, shippingAddress, paymentMethod } =
+      req.body;
 
     const productData = await Product.findById(product);
     if (!productData) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found" });
     }
 
     if (productData.totalStock < quantity) {
-      return res.status(400).json({ success: false, message: "Not enough stock" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Not enough stock" });
     }
 
     productData.totalStock -= quantity;
     await productData.save();
 
-    const priceToUse = productData.salePrice && productData.salePrice > 0 
-      ? productData.salePrice 
-      : productData.price;
+    const priceToUse =
+      productData.salePrice && productData.salePrice > 0
+        ? productData.salePrice
+        : productData.price;
 
     const totalAmount = priceToUse * quantity;
 
@@ -90,3 +96,19 @@ export const deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getOrdersByUser = async (req, res) => {
+  try {
+    const userId = req.params.userid;
+    console.log("UserID:", userId);
+
+    const orders = await Order.find({ user: userId })
+      .populate("user", "email")
+      .populate("product", "title price"); 
+
+    res.json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
